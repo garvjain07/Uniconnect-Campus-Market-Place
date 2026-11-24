@@ -21,10 +21,6 @@ const Login = () => {
       navigate('/');
     } catch (err) {
       const message = err.response?.data?.message || 'Invalid credentials';
-      if (err.response?.status === 403 && message.toLowerCase().includes('verify')) {
-        navigate(`/verify-email?email=${encodeURIComponent(form.email)}`);
-        return;
-      }
       setError(message);
     }
   };
@@ -50,9 +46,6 @@ const Login = () => {
           <div>
             <div className="flex items-center justify-between">
               <label className="text-sm font-medium text-slate-300">Password</label>
-              <Link to="/forgot-password" className="text-xs text-purple-400 hover:underline">
-                Forgot password?
-              </Link>
             </div>
             <input
               name="password"

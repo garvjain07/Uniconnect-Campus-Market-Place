@@ -106,7 +106,6 @@ export const AuthProvider = ({ children }) => {
 
   const register = useCallback(async (payload) => {
     const { data } = await registerApi(payload);
-    // Email verification is required before login; do NOT auto-login here.
     return data;
   }, []);
 

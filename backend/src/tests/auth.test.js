@@ -3,6 +3,11 @@ const jwt = require('jsonwebtoken');
 
 const users = [];
 
+jest.mock('../services/emailService', () => ({
+  sendVerificationEmail: jest.fn().mockResolvedValue(true),
+  sendPasswordResetEmail: jest.fn().mockResolvedValue(true),
+}));
+
 jest.mock('../models/User', () => ({
   create: jest.fn(async (payload) => {
     const user = {
@@ -19,6 +24,11 @@ jest.mock('../models/User', () => ({
   }),
   findOne: jest.fn(async (query) => users.find((u) => u.email === query.email)),
   findById: jest.fn(async (id) => users.find((u) => u._id === id)),
+  deleteOne: jest.fn(async (query) => {
+    const index = users.findIndex((u) => u._id === query._id);
+    if (index >= 0) users.splice(index, 1);
+    return { deletedCount: index >= 0 ? 1 : 0 };
+  }),
 }));
 
 const app = require('../app');
@@ -39,7 +49,7 @@ describe('auth controller', () => {
     expect(res.body.email).toBe('test@college.edu');
   });
 
-  it('fails login for unverified user', async () => {
+  it('allows login for password-only users', async () => {
     await User.create({
       name: 'Login',
       email: 'login@college.edu',
@@ -51,7 +61,7 @@ describe('auth controller', () => {
       email: 'login@college.edu',
       password: 'password123',
     });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
   });
 
   it('refreshes token', async () => {

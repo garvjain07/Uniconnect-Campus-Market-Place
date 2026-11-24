@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -10,14 +11,41 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
+
+const sendEmail = async ({ to, subject, html }) => {
+  if (resend) {
+    const { error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'UniConnect <onboarding@resend.dev>',
+      to: [to],
+      subject,
+      html,
+    });
+    if (error) throw new Error(`Email delivery failed: ${error.message}`);
+    return;
+  }
+
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    throw new Error('Email provider not configured');
+  }
+
+  await transporter.sendMail({
+    from: `UniConnect <${process.env.SMTP_USER}>`,
+    to,
+    subject,
+    html,
+  });
+};
+
 /**
  * Send a 6-digit OTP verification code to the user's email.
  * @param {object} user  - Mongoose user doc with .email
  * @param {string} code  - The 6-digit OTP code
  */
 const sendVerificationEmail = async (user, code) => {
-  await transporter.sendMail({
-    from: `UniConnect <${process.env.SMTP_USER}>`,
+  await sendEmail({
     to: user.email,
     subject: 'Your UniConnect email verification code',
     html: `
@@ -39,8 +67,7 @@ const sendVerificationEmail = async (user, code) => {
  * @param {string} code  - The 6-digit OTP code
  */
 const sendPasswordResetEmail = async (user, code) => {
-  await transporter.sendMail({
-    from: `UniConnect <${process.env.SMTP_USER}>`,
+  await sendEmail({
     to: user.email,
     subject: 'UniConnect — Password Reset Code',
     html: `

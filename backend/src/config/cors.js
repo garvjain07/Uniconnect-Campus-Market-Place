@@ -28,6 +28,7 @@ const corsOriginCallback = (origin, callback) => {
   const normalizedOrigin = normalizeOrigin(origin);
   if (allowedOrigins.includes(normalizedOrigin)) return callback(null, true);
   if (/^https:\/\/[^/]+\.azurewebsites\.net$/.test(normalizedOrigin)) return callback(null, true);
+  if (/^https:\/\/[^/]+\.vercel\.app$/.test(normalizedOrigin)) return callback(null, true);
   if (/^http:\/\/(localhost|127\.0\.0\.1|10\.0\.2\.2)(:\d+)?$/.test(normalizedOrigin)) {
     return callback(null, true);
   }

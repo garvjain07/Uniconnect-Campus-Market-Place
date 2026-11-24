@@ -3,9 +3,6 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import VerifyEmail from './pages/VerifyEmail';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
 import ListingDetail from './pages/ListingDetail';
 import CreateListing from './pages/CreateListing';
 import CreateRental from './pages/CreateRental';
@@ -42,9 +39,6 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/listings/:id" element={<ListingDetail />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/listings/new" element={<CreateListing />} />
